@@ -70,6 +70,7 @@ struct UsageKitApp: App {
             SettingsWindowContent(
                 service: service,
                 notificationService: notificationService,
+                appUpdater: appUpdater,
                 claudeEnabled: $claudeEnabled,
                 codexEnabled: $codexEnabled
             )

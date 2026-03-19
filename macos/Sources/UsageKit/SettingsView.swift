@@ -4,6 +4,7 @@ import ServiceManagement
 struct SettingsWindowContent: View {
     @ObservedObject var service: UsageService
     @ObservedObject var notificationService: NotificationService
+    @ObservedObject var appUpdater: AppUpdater
     @Binding var claudeEnabled: Bool
     @Binding var codexEnabled: Bool
     @State private var providers: [ProviderEntry] = []
@@ -80,14 +81,12 @@ struct SettingsWindowContent: View {
                 )
             }
 
-            if service.isAuthenticated {
-                Section("Account") {
-                    if let email = service.accountEmail {
-                        Text(email)
+            if appUpdater.isConfigured {
+                Section("Updates") {
+                    Button("Check for Updates") {
+                        appUpdater.checkForUpdates()
                     }
-                    Button("Sign Out") {
-                        service.signOut()
-                    }
+                    .disabled(!appUpdater.canCheckForUpdates)
                 }
             }
         }
