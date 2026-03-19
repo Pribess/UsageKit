@@ -82,18 +82,15 @@ private func drawCodexRow(
     drawBarFill(barX, barY)
 }
 
-// MARK: - Codex glyph (>_ terminal prompt, sized to match Claude logo)
+// MARK: - Codex glyph (SF Symbol terminal icon)
+
+private let codexGlyphImage: NSImage? = {
+    guard let symbol = NSImage(systemSymbolName: "terminal", accessibilityDescription: nil) else { return nil }
+    let config = NSImage.SymbolConfiguration(pointSize: 10, weight: .medium)
+    return symbol.withSymbolConfiguration(config) ?? symbol
+}()
 
 private func drawCodexGlyph(x: CGFloat, y: CGFloat, size: CGFloat) {
-    let attrs: [NSAttributedString.Key: Any] = [
-        .font: NSFont.monospacedSystemFont(ofSize: size * 0.8, weight: .bold),
-        .foregroundColor: NSColor.black
-    ]
-    let glyph = NSAttributedString(string: ">_", attributes: attrs)
-    let glyphSize = glyph.size()
-    let origin = NSPoint(
-        x: x + (size - glyphSize.width) / 2,
-        y: y + (size - glyphSize.height) / 2
-    )
-    glyph.draw(at: origin)
+    guard let glyph = codexGlyphImage else { return }
+    glyph.draw(in: NSRect(x: x, y: y, width: size, height: size))
 }
