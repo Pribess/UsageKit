@@ -1,5 +1,5 @@
 import XCTest
-@testable import ClaudeUsageBar
+@testable import UsageKit
 
 final class UsageChartInterpolationTests: XCTestCase {
     func testInterpolateValuesClampsNegativeOvershootAfterReset() {

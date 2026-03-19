@@ -1,15 +1,13 @@
-<p align="center">
-  <img src="macos/Resources/icon.png" width="128" alt="Claude Usage Bar icon">
-</p>
+# UsageKit
 
-# Claude Usage Bar
+> Forked from [Blimp-Labs/claude-usage-bar](https://github.com/Blimp-Labs/claude-usage-bar)
 
 Have you ever found yourself refreshing the Claude usage page, wondering how close you are to hitting your rate limit? Yeah, I've been there too. So I built this.
 
 Now it's just a glimpse away — always sitting at the top of your screen.
 
 <p align="center">
-  <img src="macos/Resources/demo.png" width="400" alt="Claude Usage Bar demo">
+  <img src="macos/Resources/demo.png" width="400" alt="UsageKit demo">
 </p>
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)
@@ -18,7 +16,7 @@ Now it's just a glimpse away — always sitting at the top of your screen.
 
 ## What it does
 
-A tiny macOS menu bar app that shows your Claude API usage at a glance. Click it for the full picture:
+A tiny macOS menu bar app that shows your Claude API usage at a glance.
 
 - Menu bar icon with a mini dual-bar showing 5-hour and 7-day utilization
 - Detailed popover with per-window usage, per-model breakdown, and reset timers
@@ -34,8 +32,8 @@ A tiny macOS menu bar app that shows your Claude API usage at a glance. Click it
 
 ### Download
 
-1. Download `ClaudeUsageBar.dmg` from the [latest release](https://github.com/Blimp-Labs/claude-usage-bar/releases/latest)
-2. Open the disk image and drag `ClaudeUsageBar.app` into `Applications`
+1. Download `UsageKit.dmg` from the [latest release](../../releases/latest)
+2. Open the disk image and drag `UsageKit.app` into `Applications`
 3. Launch the app from `/Applications`
 4. macOS may require right-click → **Open** on first launch
 
@@ -44,8 +42,6 @@ A tiny macOS menu bar app that shows your Claude API usage at a glance. Click it
 Requires Xcode 15+ / Swift 5.9+ and macOS 14 (Sonoma) or later.
 
 ```sh
-git clone https://github.com/Blimp-Labs/claude-usage-bar.git
-cd claude-usage-bar
 make app            # build .app bundle
 make dmg            # build drag-to-Applications disk image
 make install        # copy to /Applications
@@ -53,7 +49,7 @@ make install        # copy to /Applications
 
 ## Usage
 
-1. Launch the app — a menu bar icon appears
+1. Launch UsageKit — a menu bar icon appears
 2. Click the icon → **Sign in with Claude** → authorize in your browser
 3. Paste the code back into the app
 4. The icon updates automatically (default: every 30 minutes)
@@ -67,7 +63,7 @@ Click the icon anytime to see:
 
 ## Data storage
 
-All data is stored locally in `~/.config/claude-usage-bar/`:
+All data is stored locally in `~/.config/usagekit/`:
 
 | File | Purpose |
 |------|---------|
@@ -94,7 +90,7 @@ make clean          # remove build artifacts
 This repo now uses a tag-driven release flow. Pushing a `v*` tag will:
 
 - build the `.app` bundle once
-- produce `ClaudeUsageBar.zip` for Sparkle and `ClaudeUsageBar.dmg` for manual installs
+- produce `UsageKit.zip` for Sparkle and `UsageKit.dmg` for manual installs
 - verify the packaged artifacts contain the expected app bundle resources and updater framework
 - create the GitHub Release
 - reuse GitHub-generated release notes for both the GitHub Release and the Sparkle update entry
@@ -120,22 +116,22 @@ Manual installs should prefer the DMG. The ZIP remains the source of truth for S
 You can export the current Sparkle private key from your local Keychain with:
 
 ```sh
-macos/.build/artifacts/sparkle/Sparkle/bin/generate_keys --account claude-usage-bar -x /tmp/claude-usage-bar.sparkle.key
-gh secret set SPARKLE_PRIVATE_KEY < /tmp/claude-usage-bar.sparkle.key
+macos/.build/artifacts/sparkle/Sparkle/bin/generate_keys --account usagekit -x /tmp/usagekit.sparkle.key
+gh secret set SPARKLE_PRIVATE_KEY < /tmp/usagekit.sparkle.key
 ```
 
 The appcast feed URL used by release builds is:
 
 ```text
-https://blimp-labs.github.io/claude-usage-bar/appcast.xml
+https://<owner>.github.io/<repo>/appcast.xml
 ```
 
 ### Project structure
 
 ```
 macos/                           # macOS menu bar app (Swift/SwiftUI)
-├── Sources/ClaudeUsageBar/
-│   ├── ClaudeUsageBarApp.swift      # App entry point, menu bar setup
+├── Sources/UsageKit/
+│   ├── UsageKitApp.swift            # App entry point, menu bar setup
 │   ├── UsageService.swift           # OAuth, polling, API calls
 │   ├── UsageModel.swift             # API response types
 │   ├── UsageHistoryModel.swift      # History data types, time ranges
@@ -150,7 +146,7 @@ macos/                           # macOS menu bar app (Swift/SwiftUI)
 │   └── Resources/
 │       ├── claude-logo.png          # Pre-rendered menu bar logo (512px)
 │       └── en.lproj/Localizable.strings
-├── Tests/ClaudeUsageBarTests/
+├── Tests/UsageKitTests/
 ├── Resources/                       # App bundle resources (not SwiftPM)
 │   ├── Info.plist
 │   ├── Assets.xcassets/             # App icon

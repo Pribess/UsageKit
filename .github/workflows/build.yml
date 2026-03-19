@@ -24,11 +24,11 @@ jobs:
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClaudeUsageBar.zip
-          path: macos/ClaudeUsageBar.zip
+          name: UsageKit.zip
+          path: macos/UsageKit.zip
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClaudeUsageBar.dmg
-          path: macos/ClaudeUsageBar.dmg
+          name: UsageKit.dmg
+          path: macos/UsageKit.dmg

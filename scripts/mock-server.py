@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mock Anthropic usage API server for testing ClaudeUsageBar.
+Mock Anthropic usage API server for testing UsageKit.
 
 Usage:
     python3 scripts/mock-server.py [--port 8080] [--scenario normal]
@@ -183,12 +183,20 @@ class MockHandler(BaseHTTPRequestHandler):
 
     def handle_set_scenario(self):
         name = self.path.split("/scenario/", 1)[1]
-        all_scenarios = list(SCENARIOS.keys()) + ["unauthenticated", "rate_limited", "error"]
+        all_scenarios = list(SCENARIOS.keys()) + [
+            "unauthenticated",
+            "rate_limited",
+            "error",
+        ]
         if name not in all_scenarios:
             self.send_response(400)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps({"error": f"Unknown scenario: {name}", "available": all_scenarios}).encode())
+            self.wfile.write(
+                json.dumps(
+                    {"error": f"Unknown scenario: {name}", "available": all_scenarios}
+                ).encode()
+            )
             return
         self.server.scenario = name
         print(f"\n>>> Scenario switched to: {name}\n")
@@ -201,7 +209,9 @@ class MockHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
-        self.wfile.write(json.dumps({"email": "test@example.com", "name": "Test User"}).encode())
+        self.wfile.write(
+            json.dumps({"email": "test@example.com", "name": "Test User"}).encode()
+        )
 
     def handle_usage(self):
         scenario = self.server.scenario
@@ -225,9 +235,7 @@ class MockHandler(BaseHTTPRequestHandler):
             self.send_response(500)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(
-                json.dumps({"error": "internal_server_error"}).encode()
-            )
+            self.wfile.write(json.dumps({"error": "internal_server_error"}).encode())
             return
 
         data = SCENARIOS.get(scenario, SCENARIOS["normal"])
@@ -262,8 +270,7 @@ def main():
     parser.add_argument(
         "--scenario",
         default="normal",
-        choices=list(SCENARIOS.keys())
-        + ["unauthenticated", "rate_limited", "error"],
+        choices=list(SCENARIOS.keys()) + ["unauthenticated", "rate_limited", "error"],
         help="Response scenario",
     )
     args = parser.parse_args()
@@ -285,7 +292,9 @@ def main():
     print("Test notification flow:")
     print(f"  1. Point app at http://127.0.0.1:{args.port}")
     print(f"  2. Start with: --scenario low")
-    print(f"  3. Wait for one poll, then: curl http://127.0.0.1:{args.port}/scenario/high")
+    print(
+        f"  3. Wait for one poll, then: curl http://127.0.0.1:{args.port}/scenario/high"
+    )
     print(f"  4. Next poll should trigger a notification")
     print()
 

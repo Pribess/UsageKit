@@ -1,5 +1,5 @@
 import XCTest
-@testable import ClaudeUsageBar
+@testable import UsageKit
 
 final class PollingOptionFormatterTests: XCTestCase {
     func testLocalizedPollingIntervalUsesExpectedCompactLabels() {

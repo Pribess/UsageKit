@@ -110,7 +110,7 @@ private func drawDashedBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFlo
 // MARK: - Claude logo (pre-rendered 512px template PNG)
 
 private let claudeLogoImage: NSImage? = {
-    if let bundle = claudeUsageBarResourceBundle(),
+    if let bundle = usageKitResourceBundle(),
        let png = bundle.url(forResource: "claude-logo", withExtension: "png") {
         return NSImage(contentsOf: png)
     }

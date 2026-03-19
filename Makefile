@@ -8,25 +8,25 @@ app:
 
 zip:
 	bash macos/scripts/build.sh --zip
-	bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.zip
+	bash macos/scripts/verify-release.sh macos/UsageKit.zip
 
 dmg:
 	bash macos/scripts/build.sh --dmg
-	bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.dmg
+	bash macos/scripts/verify-release.sh macos/UsageKit.dmg
 
 release-artifacts:
 	bash macos/scripts/build.sh --zip --dmg
-	bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.zip
-	bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.dmg
+	bash macos/scripts/verify-release.sh macos/UsageKit.zip
+	bash macos/scripts/verify-release.sh macos/UsageKit.dmg
 
 verify-release:
-	bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.zip
-	if [ -f macos/ClaudeUsageBar.dmg ]; then bash macos/scripts/verify-release.sh macos/ClaudeUsageBar.dmg; fi
+	bash macos/scripts/verify-release.sh macos/UsageKit.zip
+	if [ -f macos/UsageKit.dmg ]; then bash macos/scripts/verify-release.sh macos/UsageKit.dmg; fi
 
 install: app
-	rm -rf /Applications/ClaudeUsageBar.app
-	cp -R macos/ClaudeUsageBar.app /Applications/
+	rm -rf /Applications/UsageKit.app
+	cp -R macos/UsageKit.app /Applications/
 
 clean:
 	cd macos && swift package clean
-	rm -rf macos/ClaudeUsageBar.app macos/ClaudeUsageBar.zip macos/ClaudeUsageBar.dmg
+	rm -rf macos/UsageKit.app macos/UsageKit.zip macos/UsageKit.dmg

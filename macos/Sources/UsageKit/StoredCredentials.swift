@@ -30,7 +30,7 @@ struct StoredCredentialsStore {
 
     init(
         directoryURL: URL = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".config/claude-usage-bar", isDirectory: true),
+            .appendingPathComponent(".config/usagekit", isDirectory: true),
         fileManager: FileManager = .default
     ) {
         self.fileManager = fileManager

@@ -7,7 +7,7 @@ func isDiscouragedPollingOption(_ minutes: Int) -> Bool {
 func pollingOptionLabel(
     for minutes: Int,
     locale: Locale = .autoupdatingCurrent,
-    resourceBundle: Bundle? = claudeUsageBarResourceBundle()
+    resourceBundle: Bundle? = usageKitResourceBundle()
 ) -> String {
     let interval = localizedPollingInterval(for: minutes, locale: locale)
     guard isDiscouragedPollingOption(minutes) else {
