@@ -10,6 +10,10 @@ A macOS menu bar app that shows your **Claude** and **Codex** usage at a glance 
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![License](https://img.shields.io/badge/license-BSD--2--Clause-green)
 
+```sh
+brew install --cask pribess/tap/usagekit
+```
+
 ## What it does
 
 Two menu bar icons — one for Claude (Anthropic), one for Codex (OpenAI) — each with:
