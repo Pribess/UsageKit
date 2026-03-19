@@ -6,6 +6,7 @@ import AppKit
 class UsageHistoryService: ObservableObject {
     @Published var history = UsageHistory()
 
+    private let subdirectory: String?
     private var flushTimer: AnyCancellable?
     private var isDirty = false
     private var terminationObserver: Any?
@@ -13,14 +14,18 @@ class UsageHistoryService: ObservableObject {
     private static let retentionInterval: TimeInterval = 30 * 86400 // 30 days
     private static let flushInterval: TimeInterval = 300 // 5 minutes
 
-    private static var historyFileURL: URL {
-        let dir = FileManager.default.homeDirectoryForCurrentUser
+    private var historyFileURL: URL {
+        var dir = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent(".config/usagekit", isDirectory: true)
+        if let subdirectory {
+            dir = dir.appendingPathComponent(subdirectory, isDirectory: true)
+        }
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("history.json")
     }
 
-    init() {
+    init(subdirectory: String? = nil) {
+        self.subdirectory = subdirectory
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
             object: nil, queue: .main
@@ -41,7 +46,7 @@ class UsageHistoryService: ObservableObject {
     // MARK: - Load
 
     func loadHistory() {
-        let url = Self.historyFileURL
+        let url = historyFileURL
         guard FileManager.default.fileExists(atPath: url.path) else { return }
 
         do {
@@ -74,7 +79,7 @@ class UsageHistoryService: ObservableObject {
         history.dataPoints = pruned(history.dataPoints)
 
         guard let data = try? JSONEncoder.historyEncoder.encode(history) else { return }
-        try? data.write(to: Self.historyFileURL, options: .atomic)
+        try? data.write(to: historyFileURL, options: .atomic)
 
         isDirty = false
         flushTimer?.cancel()

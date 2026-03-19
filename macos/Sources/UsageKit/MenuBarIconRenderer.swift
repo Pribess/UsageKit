@@ -81,7 +81,7 @@ func renderUnauthenticatedIcon() -> NSImage {
 
 // MARK: - Bar drawing
 
-private func drawBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, cornerRadius: CGFloat, pct: Double) {
+func drawBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, cornerRadius: CGFloat, pct: Double) {
     let bgRect = NSRect(x: x, y: y, width: width, height: height)
     let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: cornerRadius, yRadius: cornerRadius)
     NSColor.black.withAlphaComponent(0.25).setFill()
@@ -97,7 +97,7 @@ private func drawBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, co
     }
 }
 
-private func drawDashedBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, cornerRadius: CGFloat) {
+func drawDashedBar(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, cornerRadius: CGFloat) {
     let rect = NSRect(x: x, y: y, width: width, height: height)
     let path = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
     NSColor.black.withAlphaComponent(0.25).setStroke()

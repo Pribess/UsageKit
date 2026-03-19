@@ -3,8 +3,20 @@ import Charts
 
 struct UsageChartView: View {
     @ObservedObject var historyService: UsageHistoryService
+    let primaryLabel: String
+    let secondaryLabel: String
     @State private var selectedRange: TimeRange = .day1
     @State private var hoverDate: Date?
+
+    init(
+        historyService: UsageHistoryService,
+        primaryLabel: String = "5h",
+        secondaryLabel: String = "7d"
+    ) {
+        self.historyService = historyService
+        self.primaryLabel = primaryLabel
+        self.secondaryLabel = secondaryLabel
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -41,7 +53,7 @@ struct UsageChartView: View {
                     x: .value("Time", point.timestamp),
                     y: .value("Usage", point.pct5h * 100)
                 )
-                .foregroundStyle(by: .value("Window", "5h"))
+                .foregroundStyle(by: .value("Window", primaryLabel))
                 .interpolationMethod(.catmullRom)
             }
 
@@ -50,7 +62,7 @@ struct UsageChartView: View {
                     x: .value("Time", point.timestamp),
                     y: .value("Usage", point.pct7d * 100)
                 )
-                .foregroundStyle(by: .value("Window", "7d"))
+                .foregroundStyle(by: .value("Window", secondaryLabel))
                 .interpolationMethod(.catmullRom)
             }
 
@@ -95,8 +107,8 @@ struct UsageChartView: View {
             }
         }
         .chartForegroundStyleScale([
-            "5h": Color.blue,
-            "7d": Color.orange
+            primaryLabel: Color.blue,
+            secondaryLabel: Color.orange
         ])
         .chartLegend(.visible)
         .chartPlotStyle { plot in

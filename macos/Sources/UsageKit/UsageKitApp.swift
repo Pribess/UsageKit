@@ -5,6 +5,9 @@ struct UsageKitApp: App {
     @StateObject private var service = UsageService()
     @StateObject private var historyService = UsageHistoryService()
     @StateObject private var notificationService = NotificationService()
+    @StateObject private var codexService = CodexUsageService()
+    @StateObject private var codexHistoryService = UsageHistoryService(subdirectory: "codex")
+    @StateObject private var codexNotificationService = NotificationService()
     @StateObject private var appUpdater = AppUpdater()
 
     var body: some Scene {
@@ -17,7 +20,7 @@ struct UsageKitApp: App {
             )
         } label: {
             Image(nsImage: service.isAuthenticated
-                ? renderIcon(pct5h: service.pct5h, pct7d: service.pct7d)
+                ? renderIcon(pct5h: 1.0 - service.pct5h, pct7d: 1.0 - service.pct7d)
                 : renderUnauthenticatedIcon()
             )
                 .task {
@@ -29,6 +32,35 @@ struct UsageKitApp: App {
                     service.historyService = historyService
                     service.notificationService = notificationService
                     service.startPolling()
+                }
+        }
+        .menuBarExtraStyle(.window)
+
+        MenuBarExtra {
+            CodexPopoverView(
+                service: codexService,
+                historyService: codexHistoryService,
+                notificationService: codexNotificationService,
+                appUpdater: appUpdater
+            )
+        } label: {
+            Image(nsImage: codexService.isAuthenticated
+                ? renderCodexIcon(
+                    pctPrimary: 1.0 - codexService.pctPrimary,
+                    pctSecondary: 1.0 - codexService.pctSecondary,
+                    primaryLabel: "5h",
+                    secondaryLabel: "7d"
+                )
+                : renderCodexUnauthenticatedIcon()
+            )
+                .task {
+                    if codexService.isAuthenticated && !UserDefaults.standard.bool(forKey: "codexSetupComplete") {
+                        UserDefaults.standard.set(true, forKey: "codexSetupComplete")
+                    }
+                    codexHistoryService.loadHistory()
+                    codexService.historyService = codexHistoryService
+                    codexService.notificationService = codexNotificationService
+                    codexService.startPolling()
                 }
         }
         .menuBarExtraStyle(.window)
