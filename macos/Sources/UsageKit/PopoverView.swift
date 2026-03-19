@@ -27,6 +27,7 @@ struct PopoverView: View {
         }
         .padding()
         .frame(width: 340)
+        .onAppear { dismissOtherMenuBarPanels() }
     }
 
     @ViewBuilder
@@ -285,6 +286,10 @@ private struct UsageBucketRow: View {
     let label: String
     let bucket: UsageBucket?
 
+    private var remaining: Double {
+        1.0 - (bucket?.utilization ?? 0) / 100.0
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -295,8 +300,8 @@ private struct UsageBucketRow: View {
                     .font(.subheadline)
                     .monospacedDigit()
             }
-            ProgressView(value: (bucket?.utilization ?? 0) / 100.0, total: 1.0)
-                .tint(colorForPct((bucket?.utilization ?? 0) / 100.0))
+            ProgressView(value: remaining, total: 1.0)
+                .tint(.orange)
             if let resetDate = bucket?.resetsAtDate {
                 Text("Resets \(resetDate, style: .relative)")
                     .font(.caption2)
@@ -306,8 +311,8 @@ private struct UsageBucketRow: View {
     }
 
     private var percentageText: String {
-        guard let pct = bucket?.utilization else { return "—" }
-        return "\(Int(round(pct)))%"
+        guard bucket?.utilization != nil else { return "—" }
+        return "\(Int(round(remaining * 100)))%"
     }
 }
 
@@ -365,10 +370,4 @@ private struct SetupThresholdSlider: View {
     }
 }
 
-private func colorForPct(_ pct: Double) -> Color {
-    switch pct {
-    case ..<0.60: return .green
-    case 0.60..<0.80: return .yellow
-    default: return .red
-    }
-}
+
