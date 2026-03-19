@@ -24,7 +24,7 @@ release-artifacts:
 	bash macos/scripts/verify-release.sh macos/UsageKit.dmg
 
 release: release-artifacts
-	@VERSION=$$(git describe --tags --abbrev=0 2>/dev/null | sed 's/v//'); \
+	@VERSION=$$(git tag -l 'v[0-9]*' --sort=-v:refname | head -1 | sed 's/v//'); \
 	NEXT=$$(echo $${VERSION:-0.0.0} | awk -F. '{print $$1"."$$2"."$$3+1}'); \
 	echo "Creating release v$$NEXT..."; \
 	gh release create "v$$NEXT" macos/UsageKit.zip macos/UsageKit.dmg --generate-notes --target main
