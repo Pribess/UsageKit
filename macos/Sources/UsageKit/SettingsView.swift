@@ -6,26 +6,37 @@ struct SettingsWindowContent: View {
     @ObservedObject var notificationService: NotificationService
     @Binding var claudeEnabled: Bool
     @Binding var codexEnabled: Bool
+    @State private var providers: [ProviderEntry] = []
+
+    private var enabledCount: Int {
+        providers.filter(\.isEnabled).count
+    }
 
     var body: some View {
         Form {
             Section("Providers") {
-                Toggle("Claude", isOn: Binding(
-                    get: { claudeEnabled },
-                    set: { newValue in
-                        if !newValue && !codexEnabled { return }
-                        claudeEnabled = newValue
+                List {
+                    ForEach($providers) { $provider in
+                        HStack {
+                            Toggle(isOn: Binding(
+                                get: { provider.isEnabled },
+                                set: { newValue in
+                                    if !newValue && enabledCount <= 1 { return }
+                                    provider.isEnabled = newValue
+                                    syncProviderBindings()
+                                }
+                            )) {
+                                Text(provider.name)
+                            }
+                            .toggleStyle(.checkbox)
+                        }
                     }
-                ))
-                .toggleStyle(.checkbox)
-                Toggle("Codex", isOn: Binding(
-                    get: { codexEnabled },
-                    set: { newValue in
-                        if !newValue && !claudeEnabled { return }
-                        codexEnabled = newValue
+                    .onMove { from, to in
+                        providers.move(fromOffsets: from, toOffset: to)
+                        saveProviderOrder()
                     }
-                ))
-                .toggleStyle(.checkbox)
+                }
+                .frame(height: 52)
             }
 
             Section("General") {
@@ -75,9 +86,41 @@ struct SettingsWindowContent: View {
         .frame(width: 400)
         .fixedSize(horizontal: false, vertical: true)
         .onAppear {
+            loadProviders()
             focusSettingsWindow()
         }
     }
+
+    private func loadProviders() {
+        let order = UserDefaults.standard.stringArray(forKey: "providerOrder") ?? ["claude", "codex"]
+        providers = order.map { id in
+            ProviderEntry(
+                id: id,
+                name: id == "claude" ? "Claude" : "Codex",
+                isEnabled: id == "claude" ? claudeEnabled : codexEnabled
+            )
+        }
+    }
+
+    private func syncProviderBindings() {
+        for provider in providers {
+            switch provider.id {
+            case "claude": claudeEnabled = provider.isEnabled
+            case "codex": codexEnabled = provider.isEnabled
+            default: break
+            }
+        }
+    }
+
+    private func saveProviderOrder() {
+        UserDefaults.standard.set(providers.map(\.id), forKey: "providerOrder")
+    }
+}
+
+struct ProviderEntry: Identifiable {
+    let id: String
+    let name: String
+    var isEnabled: Bool
 }
 
 @MainActor
