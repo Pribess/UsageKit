@@ -34,6 +34,6 @@ jobs:
           gh release create latest \
             --title "Latest Build" \
             --notes "Auto-built from \`$(git rev-parse --short HEAD)\` on $(date -u '+%Y-%m-%d %H:%M UTC')" \
-            --prerelease \
+            --latest \
             macos/UsageKit.zip \
             macos/UsageKit.dmg
