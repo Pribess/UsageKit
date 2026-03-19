@@ -123,7 +123,7 @@ struct CodexPopoverView: View {
 
         HStack(spacing: 12) {
             SettingsLink {
-                Text("Settings…")
+                Text("Settings")
             }
             .buttonStyle(.borderless)
             .font(.caption)

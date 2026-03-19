@@ -150,7 +150,7 @@ struct PopoverView: View {
 
     private var settingsButton: some View {
         SettingsLink {
-            Text("Settings…")
+            Text("Settings")
         }
         .buttonStyle(.borderless)
         .font(.caption)
