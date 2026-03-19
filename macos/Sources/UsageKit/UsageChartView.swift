@@ -47,7 +47,19 @@ struct UsageChartView: View {
             UsageChartInterpolation.interpolateValues(at: $0, in: points)
         }
 
+        let gaps = noDataGaps(in: points, range: selectedRange)
+
         Chart {
+            ForEach(gaps, id: \.start) { gap in
+                RectangleMark(
+                    xStart: .value("GapStart", gap.start),
+                    xEnd: .value("GapEnd", gap.end),
+                    yStart: .value("Low", 0),
+                    yEnd: .value("High", 100)
+                )
+                .foregroundStyle(.secondary.opacity(0.2))
+            }
+
             ForEach(points) { point in
                 LineMark(
                     x: .value("Time", point.timestamp),
@@ -163,6 +175,30 @@ struct UsageChartView: View {
     }
 
     // MARK: - Formatting
+
+    private func noDataGaps(in points: [UsageDataPoint], range: TimeRange) -> [(start: Date, end: Date)] {
+        let sorted = points.sorted { $0.timestamp < $1.timestamp }
+        let rangeStart = Date.now.addingTimeInterval(-range.interval)
+        let threshold = max(range.interval / 20, 60 * 60)
+        var gaps: [(start: Date, end: Date)] = []
+
+        if let first = sorted.first, first.timestamp.timeIntervalSince(rangeStart) > threshold {
+            gaps.append((start: rangeStart, end: first.timestamp))
+        }
+
+        for i in 0..<(sorted.count - 1) {
+            let gap = sorted[i + 1].timestamp.timeIntervalSince(sorted[i].timestamp)
+            if gap > threshold {
+                gaps.append((start: sorted[i].timestamp, end: sorted[i + 1].timestamp))
+            }
+        }
+
+        if let last = sorted.last, Date.now.timeIntervalSince(last.timestamp) > threshold {
+            gaps.append((start: last.timestamp, end: Date.now))
+        }
+
+        return gaps
+    }
 
     private var xAxisFormat: Date.FormatStyle {
         switch selectedRange {
