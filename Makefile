@@ -23,11 +23,11 @@ release-artifacts:
 	bash macos/scripts/verify-release.sh macos/UsageKit.zip
 	bash macos/scripts/verify-release.sh macos/UsageKit.dmg
 
-release: release-artifacts
+release:
 	@VERSION=$$(git tag -l 'v[0-9]*' --sort=-v:refname | head -1 | sed 's/v//'); \
 	NEXT=$$(echo $${VERSION:-0.0.0} | awk -F. '{print $$1"."$$2"."$$3+1}'); \
-	echo "Creating release v$$NEXT..."; \
-	gh release create "v$$NEXT" macos/UsageKit.zip macos/UsageKit.dmg --generate-notes --target main
+	echo "Tagging v$$NEXT and pushing to trigger release workflow..."; \
+	git tag "v$$NEXT" && git push origin "v$$NEXT"
 
 verify-release:
 	bash macos/scripts/verify-release.sh macos/UsageKit.zip
