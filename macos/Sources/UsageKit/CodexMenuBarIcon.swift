@@ -82,15 +82,17 @@ private func drawCodexRow(
     drawBarFill(barX, barY)
 }
 
-// MARK: - Codex glyph (SF Symbol terminal icon)
+// MARK: - OpenAI logo (pre-rendered 512px template PNG)
 
-private let codexGlyphImage: NSImage? = {
-    guard let symbol = NSImage(systemSymbolName: "terminal", accessibilityDescription: nil) else { return nil }
-    let config = NSImage.SymbolConfiguration(pointSize: 10, weight: .medium)
-    return symbol.withSymbolConfiguration(config) ?? symbol
+private let openAILogoImage: NSImage? = {
+    if let bundle = usageKitResourceBundle(),
+       let png = bundle.url(forResource: "openai-logo", withExtension: "png") {
+        return NSImage(contentsOf: png)
+    }
+    return nil
 }()
 
 private func drawCodexGlyph(x: CGFloat, y: CGFloat, size: CGFloat) {
-    guard let glyph = codexGlyphImage else { return }
-    glyph.draw(in: NSRect(x: x, y: y, width: size, height: size))
+    guard let logo = openAILogoImage else { return }
+    logo.draw(in: NSRect(x: x, y: y, width: size, height: size))
 }
