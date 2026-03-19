@@ -1,4 +1,4 @@
-.PHONY: build app run zip dmg release-artifacts verify-release install clean
+.PHONY: build app run zip dmg release-artifacts release verify-release install clean
 
 build:
 	cd macos && swift build -c release
@@ -22,6 +22,12 @@ release-artifacts:
 	bash macos/scripts/build.sh --zip --dmg
 	bash macos/scripts/verify-release.sh macos/UsageKit.zip
 	bash macos/scripts/verify-release.sh macos/UsageKit.dmg
+
+release: release-artifacts
+	@VERSION=$$(git describe --tags --abbrev=0 2>/dev/null | sed 's/v//'); \
+	NEXT=$$(echo $${VERSION:-0.0.0} | awk -F. '{print $$1"."$$2"."$$3+1}'); \
+	echo "Creating release v$$NEXT..."; \
+	gh release create "v$$NEXT" macos/UsageKit.zip macos/UsageKit.dmg --generate-notes --target main
 
 verify-release:
 	bash macos/scripts/verify-release.sh macos/UsageKit.zip
