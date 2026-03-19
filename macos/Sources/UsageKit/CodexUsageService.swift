@@ -49,8 +49,8 @@ class CodexUsageService: ObservableObject {
     private let clientId = "app_EMoamEEZ73f0CkXaXp7hrann"
     private let redirectUri: String
 
-    var pctPrimary: Double { usage?.pctPrimary ?? 0 }
-    var pctSecondary: Double { usage?.pctSecondary ?? 0 }
+    var pctPrimary: Double? { usage?.rateLimit?.primaryWindow?.pct }
+    var pctSecondary: Double? { usage?.rateLimit?.secondaryWindow?.pct }
     var primaryLabel: String { usage?.primaryWindowLabel ?? "P" }
     var secondaryLabel: String { usage?.secondaryWindowLabel ?? "S" }
 
@@ -135,8 +135,8 @@ class CodexUsageService: ObservableObject {
             usage = decoded
             lastError = nil
             lastUpdated = Date()
-            historyService?.recordDataPoint(pct5h: pctPrimary, pct7d: pctSecondary)
-            notificationService?.checkAndNotify(pct5h: pctPrimary, pct7d: pctSecondary, pctExtra: 0)
+            historyService?.recordDataPoint(pct5h: pctPrimary ?? 0, pct7d: pctSecondary ?? 0)
+            notificationService?.checkAndNotify(pct5h: pctPrimary ?? 0, pct7d: pctSecondary ?? 0, pctExtra: 0)
             if currentInterval != baseInterval {
                 currentInterval = baseInterval
                 scheduleTimer()

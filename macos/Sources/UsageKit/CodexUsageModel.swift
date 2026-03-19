@@ -1,16 +1,24 @@
 import Foundation
 
 struct CodexUsageResponse: Codable {
+    let accountID: String?
+    let userID: String?
+    let email: String?
     let planType: String?
     let rateLimit: CodexRateLimitDetails?
     let credits: CodexCredits?
-    let additionalRateLimits: [CodexRateLimitDetails]?
+    let additionalRateLimits: [CodexAdditionalRateLimit]?
+    let codeReviewRateLimit: CodexRateLimitDetails?
 
     enum CodingKeys: String, CodingKey {
+        case accountID = "account_id"
+        case userID = "user_id"
+        case email
         case planType = "plan_type"
         case rateLimit = "rate_limit"
         case credits
         case additionalRateLimits = "additional_rate_limits"
+        case codeReviewRateLimit = "code_review_rate_limit"
     }
 
     var pctPrimary: Double {
@@ -43,6 +51,18 @@ struct CodexUsageResponse: Codable {
 
     var secondaryWindowDisplayLabel: String {
         rateLimit?.secondaryWindow?.windowDisplayLabel ?? "Secondary Window"
+    }
+}
+
+struct CodexAdditionalRateLimit: Codable {
+    let limitName: String?
+    let meteredFeature: String?
+    let rateLimit: CodexRateLimitDetails?
+
+    enum CodingKeys: String, CodingKey {
+        case limitName = "limit_name"
+        case meteredFeature = "metered_feature"
+        case rateLimit = "rate_limit"
     }
 }
 

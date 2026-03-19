@@ -45,15 +45,7 @@ struct UsageKitApp: App {
                 appUpdater: appUpdater
             )
         } label: {
-            Image(nsImage: codexService.isAuthenticated
-                ? renderCodexIcon(
-                    pctPrimary: 1.0 - codexService.pctPrimary,
-                    pctSecondary: 1.0 - codexService.pctSecondary,
-                    primaryLabel: "5h",
-                    secondaryLabel: "7d"
-                )
-                : renderCodexUnauthenticatedIcon()
-            )
+            Image(nsImage: codexMenuBarImage)
                 .task {
                     if codexService.isAuthenticated && !UserDefaults.standard.bool(forKey: "codexSetupComplete") {
                         UserDefaults.standard.set(true, forKey: "codexSetupComplete")
@@ -77,5 +69,20 @@ struct UsageKitApp: App {
         }
         .windowResizability(.contentSize)
         .windowStyle(.titleBar)
+    }
+
+    private var codexMenuBarImage: NSImage {
+        guard codexService.isAuthenticated,
+              let pctPrimary = codexService.pctPrimary,
+              let pctSecondary = codexService.pctSecondary else {
+            return renderCodexUnauthenticatedIcon()
+        }
+
+        return renderCodexIcon(
+            pctPrimary: 1.0 - pctPrimary,
+            pctSecondary: 1.0 - pctSecondary,
+            primaryLabel: "5h",
+            secondaryLabel: "7d"
+        )
     }
 }

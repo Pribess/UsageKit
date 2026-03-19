@@ -143,8 +143,9 @@ private struct CodexUsageRow: View {
     let pct: Int?
     let resetDate: Date?
 
-    private var remaining: Double {
-        1.0 - Double(pct ?? 0) / 100.0
+    private var remaining: Double? {
+        guard let pct else { return nil }
+        return 1.0 - Double(pct) / 100.0
     }
 
     var body: some View {
@@ -157,8 +158,13 @@ private struct CodexUsageRow: View {
                     .font(.subheadline)
                     .monospacedDigit()
             }
-            ProgressView(value: remaining, total: 1.0)
-                .tint(.green)
+            if let remaining {
+                ProgressView(value: remaining, total: 1.0)
+                    .tint(.green)
+            } else {
+                ProgressView()
+                    .controlSize(.small)
+            }
             if let resetDate {
                 Text("Resets \(resetDate, style: .relative)")
                     .font(.caption2)
@@ -168,7 +174,7 @@ private struct CodexUsageRow: View {
     }
 
     private var percentageText: String {
-        guard pct != nil else { return "—" }
+        guard let remaining else { return "—" }
         return "\(Int(round(remaining * 100)))%"
     }
 }
@@ -202,5 +208,4 @@ private struct CodexCreditsView: View {
         }
     }
 }
-
 
