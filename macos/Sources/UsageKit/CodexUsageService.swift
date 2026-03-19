@@ -232,21 +232,23 @@ class CodexUsageService: ObservableObject {
             callbackContinuation = continuation
 
             listener.stateUpdateHandler = { [weak self] state in
+                guard let self else { return }
+
                 switch state {
                 case .ready:
                     let opened = NSWorkspace.shared.open(authorizationURL)
                     if !opened {
-                        Task { @MainActor [weak self] in
-                            self?.finishCallback(with: .failure(CodexOAuthError.browserOpenFailed))
+                        Task { @MainActor in
+                            self.finishCallback(with: .failure(CodexOAuthError.browserOpenFailed))
                         }
                     }
                 case .failed(let error):
-                    Task { @MainActor [weak self] in
-                        self?.finishCallback(with: .failure(error))
+                    Task { @MainActor in
+                        self.finishCallback(with: .failure(error))
                     }
                 case .cancelled:
-                    Task { @MainActor [weak self] in
-                        self?.finishCallback(with: .failure(CodexOAuthError.callbackCancelled))
+                    Task { @MainActor in
+                        self.finishCallback(with: .failure(CodexOAuthError.callbackCancelled))
                     }
                 default:
                     break
@@ -254,7 +256,7 @@ class CodexUsageService: ObservableObject {
             }
 
             listener.newConnectionHandler = { [weak self] connection in
-                Task { @MainActor [weak self] in
+                Task { @MainActor in
                     self?.handleCallbackConnection(connection)
                 }
             }
