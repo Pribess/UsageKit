@@ -98,7 +98,7 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           sha=$(shasum -a 256 macos/UsageKit.dmg | awk '{print $1}')
 
-          gh repo clone Pribess/homebrew-tap /tmp/homebrew-tap
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/Pribess/homebrew-tap.git" /tmp/homebrew-tap
           printf 'cask "usagekit" do\n  version "%s"\n  sha256 "%s"\n\n  url "https://github.com/Pribess/UsageKit/releases/download/v#{version}/UsageKit.dmg"\n  name "UsageKit"\n  desc "Menu bar app that tracks Claude and Codex usage"\n  homepage "https://github.com/Pribess/UsageKit"\n\n  depends_on macos: ">= :sonoma"\n\n  app "UsageKit.app"\n\n  zap trash: [\n    "~/.config/usagekit",\n  ]\nend\n' "$version" "$sha" > /tmp/homebrew-tap/Casks/usagekit.rb
 
           cd /tmp/homebrew-tap
