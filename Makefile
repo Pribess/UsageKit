@@ -1,10 +1,14 @@
-.PHONY: build app zip dmg release-artifacts verify-release install clean
+.PHONY: build app run zip dmg release-artifacts verify-release install clean
 
 build:
 	cd macos && swift build -c release
 
 app:
 	bash macos/scripts/build.sh
+
+run: app
+	-pkill -x UsageKit
+	open macos/UsageKit.app
 
 zip:
 	bash macos/scripts/build.sh --zip
