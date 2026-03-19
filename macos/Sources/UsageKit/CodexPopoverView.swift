@@ -55,14 +55,6 @@ struct CodexPopoverView: View {
         Divider()
         HStack {
             Spacer()
-            if appUpdater.isConfigured {
-                Button("Check for Updates…") {
-                    appUpdater.checkForUpdates()
-                }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .disabled(!appUpdater.canCheckForUpdates)
-            }
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
@@ -133,14 +125,6 @@ struct CodexPopoverView: View {
             }
             .buttonStyle(.borderless)
             .font(.caption)
-            if appUpdater.isConfigured {
-                Button("Check for Updates…") {
-                    appUpdater.checkForUpdates()
-                }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .disabled(!appUpdater.canCheckForUpdates)
-            }
             Button("Sign Out") {
                 service.signOut()
             }

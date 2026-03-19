@@ -128,14 +128,6 @@ struct PopoverView: View {
             }
             .buttonStyle(.borderless)
             .font(.caption)
-            if appUpdater.isConfigured {
-                Button("Check for Updates…") {
-                    appUpdater.checkForUpdates()
-                }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .disabled(!appUpdater.canCheckForUpdates)
-            }
             Button("Sign Out") {
                 service.signOut()
             }
