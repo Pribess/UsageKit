@@ -17,6 +17,7 @@ struct SettingsWindowContent: View {
                         claudeEnabled = newValue
                     }
                 ))
+                .toggleStyle(.checkbox)
                 Toggle("Codex", isOn: Binding(
                     get: { codexEnabled },
                     set: { newValue in
@@ -24,6 +25,7 @@ struct SettingsWindowContent: View {
                         codexEnabled = newValue
                     }
                 ))
+                .toggleStyle(.checkbox)
             }
 
             Section("General") {
