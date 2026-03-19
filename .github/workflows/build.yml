@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: macos-15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -17,3 +19,9 @@ jobs:
 
       - name: Test
         run: cd macos && swift test
+
+      - name: Update latest tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git tag -f latest
+          git push origin latest --force
