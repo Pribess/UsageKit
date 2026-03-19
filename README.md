@@ -2,13 +2,7 @@
 
 > Forked from [Blimp-Labs/claude-usage-bar](https://github.com/Blimp-Labs/claude-usage-bar)
 
-Have you ever found yourself refreshing the Claude usage page, wondering how close you are to hitting your rate limit? Yeah, I've been there too. So I built this.
-
-Now it's just a glimpse away — always sitting at the top of your screen.
-
-<p align="center">
-  <img src="macos/Resources/demo.png" width="400" alt="UsageKit demo">
-</p>
+A macOS menu bar app that shows your **Claude** and **Codex** usage at a glance — always sitting at the top of your screen.
 
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
@@ -16,17 +10,21 @@ Now it's just a glimpse away — always sitting at the top of your screen.
 
 ## What it does
 
-A tiny macOS menu bar app that shows your Claude API usage at a glance.
+Two menu bar icons — one for Claude (Anthropic), one for Codex (OpenAI) — each with:
 
-- Menu bar icon with a mini dual-bar showing 5-hour and 7-day utilization
-- Detailed popover with per-window usage, per-model breakdown, and reset timers
-- Extra usage tracking with USD currency display
-- Usage history chart — see how your usage evolves over time (1h / 6h / 1d / 7d / 30d)
-- Hover over the chart to see exact values at any point
+- Dual progress bars showing remaining capacity in the 5-hour and 7-day windows
+- Detailed popover with per-window usage, reset timers, and credits
+- Usage history chart (1h / 6h / 1d / 7d / 30d) with hover details
 - Configurable polling interval (5m / 15m / 30m / 1h)
+- OAuth sign-in via browser — no API keys to manage
 - Built-in update checks via Sparkle
-- Just sign in — OAuth via browser, no API keys to manage
-- Minimal dependencies — SwiftUI, Swift Charts, Foundation, and Sparkle for updates
+
+| | Claude | Codex |
+|---|---|---|
+| Icon | Claude logo + bars (orange) | OpenAI logo + bars (green) |
+| Auth | claude.ai OAuth → paste code | auth.openai.com OAuth → localhost callback |
+| API | `/api/oauth/usage` | `/backend-api/wham/usage` |
+| Extras | Per-model breakdown, extra usage ($) | Credits (balance) |
 
 ## Install
 
@@ -43,121 +41,75 @@ Requires Xcode 15+ / Swift 5.9+ and macOS 14 (Sonoma) or later.
 
 ```sh
 make app            # build .app bundle
-make dmg            # build drag-to-Applications disk image
+make run            # build, kill existing, and launch
 make install        # copy to /Applications
 ```
 
 ## Usage
 
-1. Launch UsageKit — a menu bar icon appears
-2. Click the icon → **Sign in with Claude** → authorize in your browser
-3. Paste the code back into the app
-4. The icon updates automatically (default: every 30 minutes)
-5. Release builds show **Check for Updates…** in the popover so you can pull newer versions without re-downloading manually
+1. Launch UsageKit — two menu bar icons appear (Claude + Codex)
+2. Click either icon → **Sign in** → authorize in your browser
+3. Icons update automatically (default: every 30 minutes)
 
-Click the icon anytime to see:
-- 5-hour and 7-day usage with progress bars and reset timers
-- Per-model breakdown (Opus / Sonnet) when available
-- Extra usage credits and limits
-- Usage history chart with adjustable time range and hover details
+Progress bars show **remaining capacity** (100% = fully available, decreasing as you use more).
 
 ## Data storage
 
-All data is stored locally in `~/.config/usagekit/`:
+All data is stored locally:
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `token` | OAuth access token (permissions: `0600`) |
-| `history.json` | Usage history for the chart (30-day retention) |
+| `~/.config/usagekit/credentials.json` | Claude OAuth token |
+| `~/.config/usagekit/history.json` | Claude usage history (30-day retention) |
+| `~/.config/usagekit/codex/credentials.json` | Codex OAuth token |
+| `~/.config/usagekit/codex/history.json` | Codex usage history (30-day retention) |
 
-History is buffered in memory and flushed to disk every 5 minutes and on app quit. No data is sent anywhere other than the Anthropic API.
+No data is sent anywhere other than the Anthropic and OpenAI APIs.
 
 ## Development
 
 ```sh
 make build          # release build only
 make app            # build + create .app bundle
-make zip            # build + bundle + zip + verify distribution artifact
-make dmg            # build + bundle + DMG + verify distribution artifact
-make release-artifacts  # build once, then create and verify both ZIP and DMG
-make verify-release # inspect the packaged ZIP and DMG artifacts
+make run            # build + kill existing + launch (fast dev loop)
+make zip            # build + bundle + zip + verify
+make dmg            # build + bundle + DMG + verify
+make release-artifacts  # create and verify both ZIP and DMG
 make install        # build + install to /Applications
 make clean          # remove build artifacts
-```
-
-## Publishing updates
-
-This repo now uses a tag-driven release flow. Pushing a `v*` tag will:
-
-- build the `.app` bundle once
-- produce `UsageKit.zip` for Sparkle and `UsageKit.dmg` for manual installs
-- verify the packaged artifacts contain the expected app bundle resources and updater framework
-- create the GitHub Release
-- reuse GitHub-generated release notes for both the GitHub Release and the Sparkle update entry
-- generate a signed Sparkle `appcast.xml` from that exact zip
-- deploy the appcast to GitHub Pages
-
-Publishing a release is just:
-
-```sh
-git tag v0.0.5
-git push origin v0.0.5
-```
-
-One-time repo setup:
-
-1. Enable GitHub Pages and set the source to `GitHub Actions`.
-2. Add a repository Actions secret named `SPARKLE_PRIVATE_KEY`.
-
-Local source builds intentionally ship with Sparkle disabled unless `SU_FEED_URL` is injected during packaging. This prevents forks and local builds from auto-updating to upstream binaries.
-
-Manual installs should prefer the DMG. The ZIP remains the source of truth for Sparkle updates and appcast generation.
-
-You can export the current Sparkle private key from your local Keychain with:
-
-```sh
-macos/.build/artifacts/sparkle/Sparkle/bin/generate_keys --account usagekit -x /tmp/usagekit.sparkle.key
-gh secret set SPARKLE_PRIVATE_KEY < /tmp/usagekit.sparkle.key
-```
-
-The appcast feed URL used by release builds is:
-
-```text
-https://<owner>.github.io/<repo>/appcast.xml
 ```
 
 ### Project structure
 
 ```
-macos/                           # macOS menu bar app (Swift/SwiftUI)
+macos/
 ├── Sources/UsageKit/
-│   ├── UsageKitApp.swift            # App entry point, menu bar setup
-│   ├── UsageService.swift           # OAuth, polling, API calls
-│   ├── UsageModel.swift             # API response types
-│   ├── UsageHistoryModel.swift      # History data types, time ranges
-│   ├── UsageHistoryService.swift    # Persistence, downsampling
-│   ├── UsageChartView.swift         # Swift Charts trajectory view
-│   ├── PopoverView.swift            # Main popover UI
+│   ├── UsageKitApp.swift            # App entry point, dual MenuBarExtra
+│   ├── UsageService.swift           # Claude OAuth, polling, API
+│   ├── UsageModel.swift             # Claude API response types
+│   ├── CodexUsageService.swift      # Codex OAuth (localhost callback), polling
+│   ├── CodexUsageModel.swift        # Codex API response types
+│   ├── PopoverView.swift            # Claude popover UI
+│   ├── CodexPopoverView.swift       # Codex popover UI
+│   ├── MenuBarIconRenderer.swift    # Claude menu bar icon
+│   ├── CodexMenuBarIcon.swift       # Codex menu bar icon
+│   ├── WindowUtils.swift            # Popover mutual exclusivity
+│   ├── UsageHistoryService.swift    # History persistence, downsampling
+│   ├── UsageChartView.swift         # Swift Charts view
 │   ├── SettingsView.swift           # Settings window
 │   ├── NotificationService.swift    # Usage threshold notifications
-│   ├── MenuBarIconRenderer.swift    # Menu bar icon drawing
-│   ├── PollingOptionFormatter.swift # Polling interval display labels
-│   ├── AppUpdater.swift             # Sparkle update integration
 │   └── Resources/
-│       ├── claude-logo.png          # Pre-rendered menu bar logo (512px)
+│       ├── claude-logo.png          # Claude menu bar logo (512px)
+│       ├── openai-logo.png          # OpenAI menu bar logo (512px)
 │       └── en.lproj/Localizable.strings
 ├── Tests/UsageKitTests/
-├── Resources/                       # App bundle resources (not SwiftPM)
+├── Resources/                       # App bundle resources
 │   ├── Info.plist
-│   ├── Assets.xcassets/             # App icon
-│   └── claude-logo.svg             # Source SVG for menu bar logo
+│   └── Assets.xcassets/
 ├── scripts/
 │   ├── build.sh                     # Build + bundle + codesign
-│   └── generate-logo-png.swift      # Regenerate logo PNG from SVG
+│   └── verify-release.sh            # Release artifact verification
 └── Package.swift
-
-scripts/                         # Shared tooling
-└── mock-server.py               # Local mock API for development
 ```
 
 ## Contributing
