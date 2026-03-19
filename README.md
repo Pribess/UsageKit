@@ -1,5 +1,7 @@
 # UsageKit
 
+<img width="439" height="466" alt="image" src="https://github.com/user-attachments/assets/ef883e3a-80e7-4f8d-a21e-262bc3ddcd02" />
+
 > Forked from [Blimp-Labs/claude-usage-bar](https://github.com/Blimp-Labs/claude-usage-bar)
 
 A macOS menu bar app that shows your **Claude** and **Codex** usage at a glance — always sitting at the top of your screen.
