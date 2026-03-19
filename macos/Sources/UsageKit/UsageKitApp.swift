@@ -9,9 +9,11 @@ struct UsageKitApp: App {
     @StateObject private var codexHistoryService = UsageHistoryService(subdirectory: "codex")
     @StateObject private var codexNotificationService = NotificationService()
     @StateObject private var appUpdater = AppUpdater()
+    @AppStorage("claudeEnabled") private var claudeEnabled = true
+    @AppStorage("codexEnabled") private var codexEnabled = true
 
     var body: some Scene {
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $claudeEnabled) {
             PopoverView(
                 service: service,
                 historyService: historyService,
@@ -24,7 +26,6 @@ struct UsageKitApp: App {
                 : renderUnauthenticatedIcon()
             )
                 .task {
-                    // Auto-mark existing users as setup-complete
                     if service.isAuthenticated && !UserDefaults.standard.bool(forKey: "setupComplete") {
                         UserDefaults.standard.set(true, forKey: "setupComplete")
                     }
@@ -36,7 +37,7 @@ struct UsageKitApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $codexEnabled) {
             CodexPopoverView(
                 service: codexService,
                 historyService: codexHistoryService,
@@ -68,7 +69,9 @@ struct UsageKitApp: App {
         Settings {
             SettingsWindowContent(
                 service: service,
-                notificationService: notificationService
+                notificationService: notificationService,
+                claudeEnabled: $claudeEnabled,
+                codexEnabled: $codexEnabled
             )
         }
         .windowResizability(.contentSize)

@@ -4,9 +4,28 @@ import ServiceManagement
 struct SettingsWindowContent: View {
     @ObservedObject var service: UsageService
     @ObservedObject var notificationService: NotificationService
+    @Binding var claudeEnabled: Bool
+    @Binding var codexEnabled: Bool
 
     var body: some View {
         Form {
+            Section("Providers") {
+                Toggle("Claude", isOn: Binding(
+                    get: { claudeEnabled },
+                    set: { newValue in
+                        if !newValue && !codexEnabled { return }
+                        claudeEnabled = newValue
+                    }
+                ))
+                Toggle("Codex", isOn: Binding(
+                    get: { codexEnabled },
+                    set: { newValue in
+                        if !newValue && !claudeEnabled { return }
+                        codexEnabled = newValue
+                    }
+                ))
+            }
+
             Section("General") {
                 LaunchAtLoginToggle()
 
