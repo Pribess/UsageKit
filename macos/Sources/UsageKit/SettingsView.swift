@@ -17,26 +17,35 @@ struct SettingsWindowContent: View {
             Section("Providers") {
                 List {
                     ForEach($providers) { $provider in
-                        HStack {
+                        HStack(spacing: 8) {
                             Toggle(isOn: Binding(
                                 get: { provider.isEnabled },
                                 set: { newValue in
-                                    if !newValue && enabledCount <= 1 { return }
                                     provider.isEnabled = newValue
                                     syncProviderBindings()
                                 }
                             )) {
-                                Text(provider.name)
+                                HStack(spacing: 6) {
+                                    providerIcon(provider.icon)
+                                        .frame(width: 16, height: 16)
+                                    Text(provider.name)
+                                }
                             }
                             .toggleStyle(.checkbox)
+                            .disabled(provider.isEnabled && enabledCount <= 1)
+                            Spacer()
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundStyle(.tertiary)
                         }
+                        .padding(.vertical, 6)
                     }
                     .onMove { from, to in
-                        providers.move(fromOffsets: from, toOffset: to)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            providers.move(fromOffsets: from, toOffset: to)
+                        }
                         saveProviderOrder()
                     }
                 }
-                .frame(height: 52)
             }
 
             Section("General") {
@@ -97,6 +106,7 @@ struct SettingsWindowContent: View {
             ProviderEntry(
                 id: id,
                 name: id == "claude" ? "Claude" : "Codex",
+                icon: id == "claude" ? "claude-logo" : "openai-logo",
                 isEnabled: id == "claude" ? claudeEnabled : codexEnabled
             )
         }
@@ -120,6 +130,7 @@ struct SettingsWindowContent: View {
 struct ProviderEntry: Identifiable {
     let id: String
     let name: String
+    let icon: String
     var isEnabled: Bool
 }
 
@@ -170,6 +181,7 @@ struct LaunchAtLoginToggle: View {
             set: { model.setEnabled($0) }
         ))
         .disabled(!model.isSupported)
+        .opacity(model.isSupported ? 1.0 : 0.5)
         .controlSize(controlSize)
 
         if useSwitchStyle {
@@ -177,6 +189,22 @@ struct LaunchAtLoginToggle: View {
         } else {
             baseToggle
         }
+    }
+}
+
+@ViewBuilder
+private func providerIcon(_ name: String) -> some View {
+    if let bundle = usageKitResourceBundle(),
+       let url = bundle.url(forResource: name, withExtension: "png"),
+       let nsImage = NSImage(contentsOf: url) {
+        let template = { () -> NSImage in
+            let img = nsImage.copy() as! NSImage
+            img.isTemplate = true
+            return img
+        }()
+        Image(nsImage: template)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
     }
 }
 
