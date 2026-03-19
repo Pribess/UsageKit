@@ -136,6 +136,11 @@ struct PopoverView: View {
                 .font(.caption)
                 .disabled(!appUpdater.canCheckForUpdates)
             }
+            Button("Sign Out") {
+                service.signOut()
+            }
+            .buttonStyle(.borderless)
+            .font(.caption)
             Button("Quit") { NSApplication.shared.terminate(nil) }
                 .buttonStyle(.borderless)
                 .font(.caption)

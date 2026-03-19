@@ -122,6 +122,11 @@ struct CodexPopoverView: View {
         }
 
         HStack(spacing: 12) {
+            SettingsLink {
+                Text("Settings…")
+            }
+            .buttonStyle(.borderless)
+            .font(.caption)
             Spacer()
             Button("Refresh") {
                 Task { await service.fetchUsage() }
