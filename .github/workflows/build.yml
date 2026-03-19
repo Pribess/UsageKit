@@ -12,22 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build release binary
-        run: cd macos && swift build -c release
+      - name: Build
+        run: make build
 
-      - name: Run tests
+      - name: Test
         run: cd macos && swift test
 
-      - name: Build app archives
+      - name: Package
         run: make release-artifacts
 
-      - name: Upload ZIP artifact
+      - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
           name: UsageKit.zip
           path: macos/UsageKit.zip
 
-      - name: Upload DMG artifact
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: UsageKit.dmg
