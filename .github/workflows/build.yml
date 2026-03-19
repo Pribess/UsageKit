@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: macos-15
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -19,21 +17,3 @@ jobs:
 
       - name: Test
         run: cd macos && swift test
-
-      - name: Package
-        run: make release-artifacts
-
-      - name: Update latest release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete latest --yes 2>/dev/null || true
-          git tag -f latest
-          git push origin latest --force
-          gh release create latest \
-            --title "Latest Build" \
-            --notes "Auto-built from \`$(git rev-parse --short HEAD)\` on $(date -u '+%Y-%m-%d %H:%M UTC')" \
-            --latest \
-            macos/UsageKit.zip \
-            macos/UsageKit.dmg
